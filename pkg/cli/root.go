@@ -7,13 +7,14 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/zulubut/quapo/pkg/execs"
+	"github.com/zulubit/podcraft/pkg/execs"
 )
 
 var (
 	podmanDryFlag bool
 	fileFlag      string
 	prodFlag      bool
+	startFlag     bool
 )
 
 func init() {
@@ -24,12 +25,8 @@ func init() {
 
 	rootCmd.AddCommand(createCoomand)
 	createCoomand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
+	createCoomand.Flags().BoolVar(&startFlag, "start", false, "Start also tries to start the pod")
 	createCoomand.Flags().StringVarP(&fileFlag, "file", "f", "", "Prints the commands about to be run to the terminal")
-
-	rootCmd.AddCommand(upCoomand)
-	upCoomand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
-	upCoomand.Flags().StringVarP(&fileFlag, "file", "f", "", "Prints the commands about to be run to the terminal")
-
 }
 
 var rootCmd = &cobra.Command{
@@ -74,34 +71,20 @@ var createCoomand = &cobra.Command{
 			log.Fatalf("%v", err)
 		}
 
-		fmt.Printf("\nCreated successfully, you can start your pod with 'podman pod start %s'\nYou can view your logs by running 'podman pod logs -f -c <container name> %s'\n", *podname, *podname)
+		if startFlag {
+			fmt.Println("\nPod created successfully, now trying to start.\n ")
+			err = execs.TryStartPod(*podname)
+			if err != nil {
+				log.Fatalf("%v", err)
+			}
+			fmt.Println("Success!")
 
-	},
-}
+			fmt.Printf("\nYou can view your logs by running 'podman pod logs -f -c <container name> %s'\n", *podname)
 
-var upCoomand = &cobra.Command{
-	Use:   "up",
-	Short: "Up generates commands and tries to run them, then it tries to start the pod",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Quapo is creating the pod.\n ")
+		} else {
 
-		if fileFlag == "" {
-			fileFlag = "./quadlets.toml"
+			fmt.Printf("\nCreated successfully, you can start your pod with 'podman pod start %s'\nYou can view your logs by running 'podman pod logs -f -c <container name> %s'\n", *podname, *podname)
 		}
-
-		podname, err := execs.CreatePodman(fileFlag, prodFlag)
-		if err != nil {
-			log.Fatalf("%v", err)
-		}
-
-		fmt.Println("\nPod created successfully, now trying to start.\n ")
-
-		err = execs.TryStartPod(*podname)
-		if err != nil {
-			log.Fatalf("%v", err)
-		}
-
-		fmt.Printf("\nYou can view your logs by running 'podman pod logs -f -c <container name> %s'\n", *podname)
 
 	},
 }

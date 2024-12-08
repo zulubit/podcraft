@@ -15,6 +15,7 @@ id = "a"
 dev = "wordpress"
 prod = "wordpress-prod"
 
+# WordPress FPM Container
 [[quadlets]]
 name = "wordpress-app"
 type = "Container"
@@ -24,16 +25,16 @@ Label=app=wordpress
 Pod=wordpress-pod
 ContainerName=wordpress-app
 Image=docker.io/library/wordpress:6
-Network=<<<.a>>>
+Network=wordpress
+PublishPort=8080:80
 Volume=wordpress-app.volume:/var/www/html
 Environment=WORDPRESS_DB_HOST=wordpress-db
 Environment=WORDPRESS_DB_USER=wordpress
 Environment=WORDPRESS_DB_NAME=wordpress
-# This one should be stored in a secret
 Environment=WORDPRESS_DB_PASSWORD=password
-PublishPort=8080:80
 """
 
+# MariaDB Container
 [[quadlets]]
 name = "wordpress-db"
 type = "Container"
@@ -41,38 +42,41 @@ quadlet = """
 [Container]
 Label=app=wordpress
 Pod=wordpress-pod
-ContainerName=wordpress-db
 Image=docker.io/library/mariadb:10
+ContainerName=wordpress-db
 Network=wordpress
 Volume=wordpress-db.volume:/var/lib/mysql
 Environment=MARIADB_RANDOM_ROOT_PASSWORD=1
 Environment=MARIADB_USER=wordpress
 Environment=MARIADB_DATABASE=wordpress
-# This one should be stored in a secret
 Environment=MARIADB_PASSWORD=password
 """
 
+# WordPress DB Volume
 [[quadlets]]
 name = "wordpress-db"
 type = "Volume"
-quadlet="""
+quadlet = """
 [Volume]
 Label=app=wordpress
 VolumeName=wordpress-db.volume
 """
+
+# WordPress App Volume
 [[quadlets]]
 name = "wordpress-app"
 type = "Volume"
-quadlet="""
+quadlet = """
 [Volume]
 Label=app=wordpress
 VolumeName=wordpress-app.volume
 """
 
+# WordPress Network
 [[quadlets]]
 name = "wordpress"
 type = "Network"
-quadlet="""
+quadlet = """
 [Network]
 Label=app=wordpress
 NetworkName=wordpress

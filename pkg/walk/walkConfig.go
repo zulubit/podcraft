@@ -1,11 +1,12 @@
 package walk
 
 import (
+	"errors"
 	"fmt"
 
-	"github.com/zulubut/quapo/pkg/configfile"
-	"github.com/zulubut/quapo/pkg/readini"
-	"github.com/zulubut/quapo/pkg/validate"
+	"github.com/zulubit/podcraft/pkg/configfile"
+	"github.com/zulubit/podcraft/pkg/readini"
+	"github.com/zulubit/podcraft/pkg/validate"
 )
 
 type Actionables []Actionable
@@ -76,7 +77,9 @@ func WalkQuadlets(config *configfile.Config) (*Actionables, error) {
 				return nil, err
 			}
 
-			//validate container name
+			if Image, exists := quadData["Image"]; !exists || len(Image) == 0 {
+				return nil, errors.New("[Container] units must have an 'Image' defined")
+			}
 		}
 
 		quadActionable := Actionable{

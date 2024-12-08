@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/zulubut/quapo/pkg/commands"
-	"github.com/zulubut/quapo/pkg/configfile"
-	"github.com/zulubut/quapo/pkg/replaceables"
-	"github.com/zulubut/quapo/pkg/validate"
-	"github.com/zulubut/quapo/pkg/walk"
+	"github.com/zulubit/podcraft/pkg/commands"
+	"github.com/zulubit/podcraft/pkg/configfile"
+	"github.com/zulubit/podcraft/pkg/replaceables"
+	"github.com/zulubit/podcraft/pkg/validate"
+	"github.com/zulubit/podcraft/pkg/walk"
 )
 
 func getCommands(filename string, prod bool) (*[]string, *configfile.Config, error) {

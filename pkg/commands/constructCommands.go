@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"github.com/zulubut/quapo/pkg/commandmap"
-	"github.com/zulubut/quapo/pkg/walk"
+	"github.com/zulubit/podcraft/pkg/commandmap"
+	"github.com/zulubit/podcraft/pkg/walk"
 )
 
 func ConstructCommands(actionables walk.Actionables) (*[]string, error) {

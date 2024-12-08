@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/BurntSushi/toml"
-	"github.com/zulubut/quapo/pkg/configfile"
+	"github.com/zulubit/podcraft/pkg/configfile"
 )
 
 // validateUnits checks if the required fields are present in the parsed Units.
@@ -34,6 +34,21 @@ func ValidateNoExtraKeys(metaData *toml.MetaData) error {
 	return nil
 }
 
+// validate missing keys
+func ValidateMissingKeys(config *configfile.Config) error {
+	if config.Pod.Name == "" || config.Pod.Quadlet == "" {
+		return fmt.Errorf("[main_pod] configuration is incomplete. Both name and quadlet must be set")
+	}
+
+	for _, q := range config.Quadlets {
+		if q.Name == "" || q.Quadlet == "" || q.Type == "" {
+			return fmt.Errorf("[[quadlet]] configuration is incomplete. Name, quadlet and type must be set")
+		}
+	}
+
+	return nil
+}
+
 // validate unit type
 func ValidateUnitType(unitType string) error {
 	if unitType == "Pod" || unitType == "pod" {
@@ -48,7 +63,7 @@ func ValidateUnitType(unitType string) error {
 // validates containers use the right pod
 func ValidateContainerPod(containerPod string, podName string, containerName string) error {
 	if containerPod != podName {
-		return fmt.Errorf("pod name mismatch in container %s and pod %s. Every container must be part of the top level pod.\n", containerName, podName)
+		return fmt.Errorf("pod name mismatch in container '%s' and pod '%s'. Every container must be part of the top level pod.\n", containerName, podName)
 	}
 	return nil
 }

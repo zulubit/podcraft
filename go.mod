@@ -1,4 +1,4 @@
-module github.com/zulubut/quapo
+module github.com/zulubit/podcraft
 
 go 1.23.3
 

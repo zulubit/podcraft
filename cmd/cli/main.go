@@ -1,6 +1,6 @@
 package main
 
-import "github.com/zulubut/quapo/pkg/cli"
+import "github.com/zulubit/podcraft/pkg/cli"
 
 func main() {
 	cli.Execute()

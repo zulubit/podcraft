@@ -7,7 +7,7 @@ import (
 	"html/template"
 	"regexp"
 
-	"github.com/zulubut/quapo/pkg/configfile"
+	"github.com/zulubit/podcraft/pkg/configfile"
 )
 
 type ReplaceablesMap map[string]string
