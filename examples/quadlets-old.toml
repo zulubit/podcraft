@@ -1,0 +1,48 @@
+[main_pod]
+name = "wordpress-pod"
+quadlet = """
+[Pod]
+PublishPort=8080:80
+"""
+
+[[quadlets]]
+name = "wordpress-container"
+type = "Container"
+quadlet = """
+[Container]
+Pod=wordpress-pod
+Image=docker.io/library/wordpress:latest
+ContainerName=wordpress-container
+Environment=WORDPRESS_DB_HOST=mysql-container
+Environment=WORDPRESS_DB_USER=wpuser
+Environment=WORDPRESS_DB_PASSWORD=wppassword
+Environment=WORDPRESS_DB_NAME=wordpress
+
+[Unit]
+Description=WordPress Application Container
+
+[Install]
+WantedBy=multi-user.target
+"""
+
+[[quadlets]]
+name = "mysql-container"
+type = "Container"
+quadlet = """
+[Container]
+Pod=wordpress-pod
+ContainerName=mysql-container
+Image=docker.io/library/mysql:9.1.0
+Volume=mysql-data:/var/lib/mysql
+Environment=MYSQL_ROOT_PASSWORD=rootpassword
+Environment=MYSQL_DATABASE=wordpress
+Environment=MYSQL_USER=wpuser
+Environment=MYSQL_PASSWORD=wppassword
+
+[Unit]
+Description=MySQL Database for WordPress
+
+[Install]
+WantedBy=multi-user.target
+"""
+
