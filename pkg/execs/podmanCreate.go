@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/zulubit/podcraft/pkg/color"
 )
 
 func CreatePodman(filename string, prod bool) (*string, error) {
@@ -23,7 +25,7 @@ func CreatePodman(filename string, prod bool) (*string, error) {
 func tryRunCommands(commandSlice *[]string, podName string) error {
 
 	for _, c := range *commandSlice {
-		fmt.Printf("\nRunning: %s\n", c)
+		fmt.Printf("\n"+color.ColorYellow+"Running:"+color.ColorReset+" %s\n", c)
 
 		cmd := exec.Command("bash", "-c", c)
 		// Set the command's stdout and stderr to the user's terminal
@@ -32,11 +34,11 @@ func tryRunCommands(commandSlice *[]string, podName string) error {
 
 		err := cmd.Run()
 		if err != nil {
-			fmt.Println("Fail! deleting the created pod")
+			fmt.Println(color.ColorRed + "Fail! deleting the created pod" + color.ColorReset)
 			exec.Command("bash", "-c", "podman pod rm -f "+podName).Run()
 			return err
 		}
-		fmt.Println("Success!")
+		fmt.Println(color.ColorGreen + "Success!" + color.ColorReset)
 	}
 
 	return nil

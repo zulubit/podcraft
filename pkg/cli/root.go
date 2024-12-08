@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/zulubit/podcraft/pkg/color"
 	"github.com/zulubit/podcraft/pkg/execs"
 )
 
@@ -27,6 +28,11 @@ func init() {
 	createCoomand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
 	createCoomand.Flags().BoolVar(&startFlag, "start", false, "Start also tries to start the pod")
 	createCoomand.Flags().StringVarP(&fileFlag, "file", "f", "", "Prints the commands about to be run to the terminal")
+
+	rootCmd.AddCommand(destroyCommand)
+	destroyCommand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
+	destroyCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Prints the commands about to be run to the terminal")
+
 }
 
 var rootCmd = &cobra.Command{
@@ -60,8 +66,6 @@ var createCoomand = &cobra.Command{
 	Use:   "create",
 	Short: "Create command generates commands and tries to run them",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Quapo is creating the pod.\n ")
-
 		if fileFlag == "" {
 			fileFlag = "./quadlets.toml"
 		}
@@ -72,20 +76,38 @@ var createCoomand = &cobra.Command{
 		}
 
 		if startFlag {
-			fmt.Println("\nPod created successfully, now trying to start.\n ")
+			fmt.Println("\nPod created successfully, now trying to start...\n ")
 			err = execs.TryStartPod(*podname)
 			if err != nil {
 				log.Fatalf("%v", err)
 			}
-			fmt.Println("Success!")
-
-			fmt.Printf("\nYou can view your logs by running 'podman pod logs -f -c <container name> %s'\n", *podname)
-
+			fmt.Println(color.ColorGreen + "Started!" + color.ColorReset)
 		} else {
 
 			fmt.Printf("\nCreated successfully, you can start your pod with 'podman pod start %s'\nYou can view your logs by running 'podman pod logs -f -c <container name> %s'\n", *podname, *podname)
 		}
 
+	},
+}
+
+var destroyCommand = &cobra.Command{
+	Use:   "destroy",
+	Short: "Destroy forcefully removes the pod and prunes the networks",
+	RunE: func(cmd *cobra.Command, args []string) error {
+
+		if fileFlag == "" {
+			fileFlag = "./quadlets.toml"
+		}
+
+		err := execs.PodmanRmf(fileFlag, prodFlag)
+		if err != nil {
+			return err
+		}
+		fmt.Println(color.ColorGreen + "\nSuccess!" + color.ColorReset)
+
+		fmt.Println("\nThis action DID NOT remove your volumes, to remove them find one by running 'podman volume ls' and run 'podman volume rm <volume name>'")
+
+		return nil
 	},
 }
 

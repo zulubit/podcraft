@@ -25,7 +25,7 @@ Label=app=wordpress
 Pod=wordpress-pod
 ContainerName=wordpress-app
 Image=docker.io/library/wordpress:6
-Network=wordpress
+Network=wordpress.network
 PublishPort=8080:80
 Volume=wordpress-app.volume:/var/www/html
 Environment=WORDPRESS_DB_HOST=wordpress-db
@@ -44,7 +44,7 @@ Label=app=wordpress
 Pod=wordpress-pod
 Image=docker.io/library/mariadb:10
 ContainerName=wordpress-db
-Network=wordpress
+Network=wordpress.network
 Volume=wordpress-db.volume:/var/lib/mysql
 Environment=MARIADB_RANDOM_ROOT_PASSWORD=1
 Environment=MARIADB_USER=wordpress
