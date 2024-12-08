@@ -58,8 +58,6 @@ name = "wordpress-db"
 type = "Volume"
 quadlet = """
 [Volume]
-Label=app=wordpress
-VolumeName=wordpress-db.volume
 """
 
 # WordPress App Volume
@@ -68,8 +66,6 @@ name = "wordpress-app"
 type = "Volume"
 quadlet = """
 [Volume]
-Label=app=wordpress
-VolumeName=wordpress-app.volume
 """
 
 # WordPress Network
@@ -78,6 +74,4 @@ name = "wordpress"
 type = "Network"
 quadlet = """
 [Network]
-Label=app=wordpress
-NetworkName=wordpress
 """

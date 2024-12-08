@@ -54,8 +54,25 @@ func formatNetworkFlag(key, value string) (string, error) {
 // GeneratePodmanNetworkCommand generates a `podman network create` command from the provided options.
 func GeneratePodmanNetworkCommand(name string, options map[string][]string) (string, error) {
 	parts := []string{}
+	var networkName string
 
 	for key, values := range options {
+		field, ok := VolumeToPodman[key]
+		if !ok {
+			return "", fmt.Errorf("unknown key: %s", key)
+		}
+
+		if field.Type == "special" {
+			// Handle "VolumeName" as a required positional argument
+			if key == "NetworkName" {
+				if len(values) > 0 {
+					networkName = values[0] // Use the first value of VolumeName
+				}
+				continue
+			}
+			continue // Skip other special mappings for now
+		}
+
 		for _, value := range values {
 			part, err := formatNetworkFlag(key, value)
 			if err != nil {
@@ -65,10 +82,14 @@ func GeneratePodmanNetworkCommand(name string, options map[string][]string) (str
 		}
 	}
 
+	if networkName == "" {
+		networkName = name + ".network"
+	}
+
 	return fmt.Sprintf(
 		"podman network exists %s || podman network create %s %s",
-		name,
+		networkName,
 		strings.Join(parts, " "),
-		name,
+		networkName,
 	), nil
 }

@@ -80,8 +80,9 @@ func GeneratePodmanVolumeCommand(name string, options map[string][]string) (stri
 		}
 	}
 
+	//
 	if volumeName == "" {
-		return "", fmt.Errorf("missing required field: VolumeName\n")
+		volumeName = name + ".volume"
 	}
 
 	return fmt.Sprintf(
