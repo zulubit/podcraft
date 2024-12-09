@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -12,43 +11,41 @@ import (
 )
 
 var (
-	podmanDryFlag bool
-	fileFlag      string
-	prodFlag      bool
-	startFlag     bool
+	fileFlag     string
+	prodFlag     bool
+	startFlag    bool
+	locationFlag string
 )
 
 func init() {
 	rootCmd.AddCommand(dryCoomand)
-	dryCoomand.Flags().BoolVar(&podmanDryFlag, "podman", false, "Prints the commands about to be run to the terminal")
 	dryCoomand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
-	dryCoomand.Flags().StringVarP(&fileFlag, "file", "f", "", "Prints the commands about to be run to the terminal")
+	dryCoomand.Flags().StringVarP(&fileFlag, "file", "f", "", "Set what TOML file to read. Default is quadlets.toml")
 
 	rootCmd.AddCommand(createCoomand)
 	createCoomand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
 	createCoomand.Flags().BoolVar(&startFlag, "start", false, "Start also tries to start the pod")
-	createCoomand.Flags().StringVarP(&fileFlag, "file", "f", "", "Prints the commands about to be run to the terminal")
+	createCoomand.Flags().StringVarP(&fileFlag, "file", "f", "", "Set what TOML file to read. Default is quadlets.toml")
 
 	rootCmd.AddCommand(destroyCommand)
 	destroyCommand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
-	destroyCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Prints the commands about to be run to the terminal")
+	destroyCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Set what TOML file to read. Default is quadlets.toml")
 
+	rootCmd.AddCommand(putCommand)
+	putCommand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
+	putCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Set what TOML file to read. Default is quadlets.toml")
+	putCommand.Flags().StringVarP(&locationFlag, "location", "l", "", "location specifies the directory to put the quadlets into. Default is ./podcraft")
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "quapo",
-	Short: "Somewhat like docker compose but for quadlets",
+	Use:   "podcraft",
+	Short: "Somewhat like podman compose but for quadlets",
 }
 
 var dryCoomand = &cobra.Command{
 	Use:   "dry",
 	Short: "Print the comands to run the pod locally to the terminal",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		if !podmanDryFlag {
-			return errors.New("--podman or --quadlet flag required")
-		}
-
 		if fileFlag == "" {
 			fileFlag = "./quadlets.toml"
 		}
@@ -106,6 +103,24 @@ var destroyCommand = &cobra.Command{
 		fmt.Println(color.ColorGreen + "\nSuccess!" + color.ColorReset)
 
 		fmt.Println("\nThis action DID NOT remove your volumes, to remove them find one by running 'podman volume ls' and run 'podman volume rm <volume name>'")
+
+		return nil
+	},
+}
+
+var putCommand = &cobra.Command{
+	Use:   "put [location]",
+	Short: "Put puts the quadlets in the desired location",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if fileFlag == "" {
+			fileFlag = "./quadlets.toml"
+		}
+
+		err := execs.PutQuadlets(fileFlag, prodFlag, locationFlag)
+		if err != nil {
+			return err
+		}
+		fmt.Println(color.ColorGreen + "\nSuccess!" + color.ColorReset)
 
 		return nil
 	},
