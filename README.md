@@ -1,16 +1,18 @@
 # .--. -.-.
 
-**PodCraft**: Run podman quadlets locally with ease.
+**PodCraft**: Run podman quadlets locally.
+
+[![Watch the Demo](demo.png)](demo.mp4)
 
 ---
 
-PodCraft is a CLI utility designed to enable the local execution of podman quadlets, addressing the lack of support for running quadlets locally, particularly on macOS. Whether you're developing, simulating, or preparing quadlets for production, PodCraft makes the process seamless and efficient.
+PodCraft is a CLI utility designed to enable the local execution of podman quadlets, addressing the lack of support for running quadlets locally, particularly on macOS.
 
 ---
 
 ## Features
 
-- **Simulate Pod Commands**: Generate and inspect podman commands for your quadlets without executing them.
+- **Simulate Pod Commands**: Generate and inspect podman commands intended to run your quadlets locally without executing them.
 - **Create Pods**: Transform quadlet configurations into running podman pods.
 - **Destroy Pods**: Clean up resources associated with your pods.
 - **Prepare for Production**: Write standard quadlet unit files for deployment.
@@ -19,7 +21,7 @@ PodCraft is a CLI utility designed to enable the local execution of podman quadl
 
 ## Installation
 
-PodCraft is not quite ready for prime time. It's in a **proof of concept** stage.
+PodCraft is not quite ready for prime time. It's in a **proof of concept** stage (code is not well tested and there are bugs).
 
 If you'd like to try it out anyway you can clone the repository and install it with go:
 
@@ -45,7 +47,6 @@ Usage:
   podcraft [command]
 
 Available Commands:
-  completion  Generate the autocompletion script for the specified shell
   create      Create and optionally start the pod
   destroy     Remove the pod and clean up resources
   dry         Simulate pod commands
@@ -226,11 +227,6 @@ The `[[quadlets]]` section defines the individual quadlets that make up the pod.
 - **`name`**: The name of the quadlet.
 - **`type`**: The type of quadlet (`Container`, `Volume`, or `Network`).
 - **`quadlet`**: The systemd definition for the quadlet, written as a string block.
-
-#### Quadlet Types:
-1. **`Container`**: Defines a container to run in the pod.
-2. **`Volume`**: Declares a persistent storage volume.
-3. **`Network`**: Specifies a custom network for the pod.
 
 Example:
 
