@@ -31,8 +31,6 @@ cd podcraft
 go install ./cmd/podcraft
 ```
 
-or download the [binary](https://github.com/zulubit/podcraft/releases/latest).
-
 ---
 
 ## Usage
