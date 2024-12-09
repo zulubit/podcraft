@@ -18,33 +18,40 @@ var (
 )
 
 func init() {
-	rootCmd.AddCommand(dryCoomand)
-	dryCoomand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
-	dryCoomand.Flags().StringVarP(&fileFlag, "file", "f", "", "Set what TOML file to read. Default is quadlets.toml")
+	rootCmd.AddCommand(dryCommand)
+	dryCommand.Flags().BoolVar(&prodFlag, "prod", false, "Use 'prod' settings instead of 'dev'. Default is 'dev'")
+	dryCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Specify the TOML configuration file. Default is quadlets.toml")
 
-	rootCmd.AddCommand(createCoomand)
-	createCoomand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
-	createCoomand.Flags().BoolVar(&startFlag, "start", false, "Start also tries to start the pod")
-	createCoomand.Flags().StringVarP(&fileFlag, "file", "f", "", "Set what TOML file to read. Default is quadlets.toml")
+	rootCmd.AddCommand(createCommand)
+	createCommand.Flags().BoolVar(&prodFlag, "prod", false, "Use 'prod' settings instead of 'dev'. Default is 'dev'")
+	createCommand.Flags().BoolVar(&startFlag, "start", false, "Start the pod immediately after creation")
+	createCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Specify the TOML configuration file. Default is quadlets.toml")
 
 	rootCmd.AddCommand(destroyCommand)
-	destroyCommand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
-	destroyCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Set what TOML file to read. Default is quadlets.toml")
+	destroyCommand.Flags().BoolVar(&prodFlag, "prod", false, "Use 'prod' settings instead of 'dev'. Default is 'dev'")
+	destroyCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Specify the TOML configuration file. Default is quadlets.toml")
 
 	rootCmd.AddCommand(putCommand)
-	putCommand.Flags().BoolVar(&prodFlag, "prod", false, "Takes 'prod' replaceables insted of 'dev'")
-	putCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Set what TOML file to read. Default is quadlets.toml")
-	putCommand.Flags().StringVarP(&locationFlag, "location", "l", "", "location specifies the directory to put the quadlets into. Default is ./podcraft")
+	putCommand.Flags().BoolVar(&prodFlag, "prod", false, "Use 'prod' settings instead of 'dev'. Default is 'dev'")
+	putCommand.Flags().StringVarP(&fileFlag, "file", "f", "", "Specify the TOML configuration file. Default is quadlets.toml")
+	putCommand.Flags().StringVarP(&locationFlag, "location", "l", "", "Specify the directory to save the quadlets. Default is ./podcraft")
 }
 
 var rootCmd = &cobra.Command{
 	Use:   "podcraft",
-	Short: "Somewhat like podman compose but for quadlets",
+	Short: "podcraft - Run podman quadlets locally with ease",
+	Long: `.--. -.-.
+
+podcraft is a CLI utility designed to enable local execution of podman quadlets, 
+addressing the lack of support for local quadlet execution. This tool lets you configure, simulate, and run pods locally.`,
 }
 
-var dryCoomand = &cobra.Command{
+var dryCommand = &cobra.Command{
 	Use:   "dry",
-	Short: "Print the comands to run the pod locally to the terminal",
+	Short: "Simulate pod commands",
+	Long: `The 'dry' command simulates and generates the podman commands required to run the configured quadlets locally.
+This is particularly useful for development workflows where you need to inspect or debug the generated commands 
+before actual execution.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if fileFlag == "" {
 			fileFlag = "./quadlets.toml"
@@ -59,9 +66,11 @@ var dryCoomand = &cobra.Command{
 	},
 }
 
-var createCoomand = &cobra.Command{
+var createCommand = &cobra.Command{
 	Use:   "create",
-	Short: "Create command generates commands and tries to run them",
+	Short: "Create and optionally start the pod",
+	Long: `The 'create' command generates and executes the necessary podman commands
+to create a pod. It can optionally start the pod if the --start flag is provided.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if fileFlag == "" {
 			fileFlag = "./quadlets.toml"
@@ -73,25 +82,25 @@ var createCoomand = &cobra.Command{
 		}
 
 		if startFlag {
-			fmt.Println("\nPod created successfully, now trying to start...\n ")
+			fmt.Println("\nPod created successfully, attempting to start...")
 			err = execs.TryStartPod(*podname)
 			if err != nil {
 				log.Fatalf("%v", err)
 			}
 			fmt.Println(color.ColorGreen + "Started!" + color.ColorReset)
 		} else {
-
-			fmt.Printf("\nCreated successfully, you can start your pod with 'podman pod start %s'\nYou can view your logs by running 'podman pod logs -f -c <container name> %s'\n", *podname, *podname)
+			fmt.Printf("\nPod created successfully. Start it with 'podman pod start %s'.\n", *podname)
+			fmt.Printf("View logs with 'podman pod logs -f -c <container name> %s'.\n", *podname)
 		}
-
 	},
 }
 
 var destroyCommand = &cobra.Command{
 	Use:   "destroy",
-	Short: "Destroy forcefully removes the pod and prunes the networks",
+	Short: "Remove the pod and clean up resources",
+	Long: `The 'destroy' command forcefully removes the specified pod and prunes any associated networks.
+Note: This does not remove volumes. Use 'podman volume rm <volume name>' to remove volumes.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
 		if fileFlag == "" {
 			fileFlag = "./quadlets.toml"
 		}
@@ -100,17 +109,20 @@ var destroyCommand = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(color.ColorGreen + "\nSuccess!" + color.ColorReset)
 
-		fmt.Println("\nThis action DID NOT remove your volumes, to remove them find one by running 'podman volume ls' and run 'podman volume rm <volume name>'")
+		fmt.Println(color.ColorGreen + "\nPod destroyed successfully!" + color.ColorReset)
+		fmt.Println("\nVolumes were not removed. Use 'podman volume ls' to list and 'podman volume rm <volume name>' to remove them.")
 
 		return nil
 	},
 }
 
 var putCommand = &cobra.Command{
-	Use:   "put [location]",
-	Short: "Put puts the quadlets in the desired location",
+	Use:   "put",
+	Short: "Prepare and save quadlets for production",
+	Long: `The 'put' command processes your custom configuration file and generates standard quadlet unit files
+based on the defined quadlets. These files are then saved to the specified directory, making them ready
+for deployment in a production environment. If no location is provided, the default directory './podcraft' is used.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if fileFlag == "" {
 			fileFlag = "./quadlets.toml"
@@ -120,8 +132,8 @@ var putCommand = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(color.ColorGreen + "\nSuccess!" + color.ColorReset)
 
+		fmt.Println(color.ColorGreen + "\nQuadlets prepared and saved successfully!" + color.ColorReset)
 		return nil
 	},
 }
