@@ -10,7 +10,6 @@ func PrintPodman(filename string, prod bool) error {
 		return err
 	}
 
-	// Print each command on its own line
 	for _, cmd := range *comm {
 		fmt.Println("\n" + cmd)
 	}

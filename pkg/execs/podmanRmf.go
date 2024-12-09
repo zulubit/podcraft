@@ -21,7 +21,6 @@ func PodmanRmf(filename string, prod bool) error {
 		return fmt.Errorf("Error parsing TOML: %v", err)
 	}
 
-	// we should do the replacables magic here, return the entire toml back and run parsefromtoml again
 	newConfig, err := replaceables.ReplaceReplaceables(string(quatoml), *config, prod)
 	if err != nil {
 		return err

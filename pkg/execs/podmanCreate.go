@@ -28,7 +28,6 @@ func tryRunCommands(commandSlice *[]string, podName string) error {
 		fmt.Printf("\n"+color.ColorYellow+"Running:"+color.ColorReset+" %s\n", c)
 
 		cmd := exec.Command("bash", "-c", c)
-		// Set the command's stdout and stderr to the user's terminal
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 

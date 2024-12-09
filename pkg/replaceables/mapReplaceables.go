@@ -47,7 +47,7 @@ func ReplaceReplaceables(rawToml string, config configfile.Config, isProd bool) 
 	}
 
 	// Create a new template with custom delimiters
-	tmpl := template.New("example").Delims("<<<", ">>>")
+	tmpl := template.New("example").Delims("<<", ">>")
 
 	// Parse the template string
 	tmpl, err = tmpl.Parse(rawToml)

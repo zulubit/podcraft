@@ -12,10 +12,10 @@ WantedBy=multi-user.target default.target
 
 [[replaceables]]
 id = "a"
-dev = "wordpress"
-prod = "wordpress-prod"
+dev = "wordpress.network"
+prod = "wordpress-prod.network"
 
-# WordPress FPM Container
+# WordPress Container
 [[quadlets]]
 name = "wordpress-app"
 type = "Container"
@@ -25,7 +25,7 @@ Label=app=wordpress
 Pod=wordpress-pod
 ContainerName=wordpress-app
 Image=docker.io/library/wordpress:6
-Network=wordpress.network
+Network=<<.a>>
 PublishPort=8080:80
 Volume=wordpress-app.volume:/var/www/html
 Environment=WORDPRESS_DB_HOST=wordpress-db

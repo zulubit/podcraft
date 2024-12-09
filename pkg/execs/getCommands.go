@@ -22,7 +22,6 @@ func getCommands(filename string, prod bool) (*[]string, *configfile.Config, err
 		return nil, nil, fmt.Errorf("Error parsing TOML: %v", err)
 	}
 
-	// we should do the replacables magic here, return the entire toml back and run parsefromtoml again
 	newConfig, err := replaceables.ReplaceReplaceables(string(quatoml), *config, prod)
 	if err != nil {
 		return nil, nil, err
