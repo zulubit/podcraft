@@ -2,7 +2,7 @@
 
 **PodCraft**: Run podman quadlets locally.
 
-[![Watch the Demo](demo.png)](demo.mp4)
+![Demo](demo.gif)
 
 ---
 
